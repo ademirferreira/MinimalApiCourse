@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -8,6 +8,14 @@
 
   <ItemGroup>
     <Folder Include="Abstractions\" />
+    <Folder Include="Posts\Commands\" />
+    <Folder Include="Posts\CommandHandlers\" />
+    <Folder Include="Posts\QueryHandlers\" />
+    <Folder Include="Posts\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="11.1.0" />
   </ItemGroup>
 
   <ItemGroup>
