@@ -10,41 +10,49 @@ namespace MinimalApi.EndpointDefinitions
     {
         public void RegisterEndpoints(WebApplication app)
         {
-            app.MapGet("/api/posts/{id}", async (IMediator mediator, int id) =>
-            {
-                var getPost = new GetPostById { PostId = id };
-                var post = await mediator.Send(getPost);
-                return Results.Ok(post);
-            })
+            var posts = app.MapGroup("/api/posts");
+
+            posts.MapGet("/{id}", GetPostById)
                 .WithName("GetPostById");
+            posts.MapPost("/", CreatePost);
+            posts.MapGet("/", GetAllPosts);
+            posts.MapPut("/{id}", UpdatePost);
+            posts.MapDelete("/{id}", DeletePost);
+        }
 
-            app.MapPost("/api/posts", async (IMediator mediator, Post post) =>
-            {
-                var createPost = new CreatePost { PostContent = post.Content };
-                var createdPost = await mediator.Send(createPost);
-                return Results.CreatedAtRoute("GetPostById", new { createdPost.Id }, createdPost);
-            });
+        private async Task<IResult> GetPostById(IMediator mediator, int id)
+        {
+            var getPost = new GetPostById { PostId = id };
+            var post = await mediator.Send(getPost);
+            return TypedResults.Ok(post);
+        }
 
-            app.MapGet("/api/posts", async (IMediator mediator) =>
-            {
-                var getPosts = new GetAllPosts();
-                var posts = await mediator.Send(getPosts);
-                return Results.Ok(posts);
-            });
+        private async Task<IResult> CreatePost(IMediator mediator, Post post)
+        {
+            var createPost = new CreatePost { PostContent = post.Content };
+            var createdPost = await mediator.Send(createPost);
+            return Results.CreatedAtRoute("GetPostById", new { createdPost.Id }, createdPost);
+        }
 
-            app.MapPut("/api/posts/{id}", async (IMediator mediator, Post post, int id) =>
-            {
-                var updatePost = new UpdatePost { PostId = id, PostContent = post.Content };
-                var updatedPost = await mediator.Send(updatePost);
-                return Results.Ok(updatedPost);
-            });
+        private async Task<IResult> GetAllPosts(IMediator mediator)
+        {
+            var getPosts = new GetAllPosts();
+            var posts = await mediator.Send(getPosts);
+            return TypedResults.Ok(posts);
+        }
 
-            app.MapDelete("/api/posts/{id}", async (IMediator mediator, int id) =>
-            {
-                var deletePost = new DeletePost { PostId = id };
-                var deletedPost = await mediator.Send(deletePost);
-                return Results.NoContent();
-            });
+        private async Task<IResult> UpdatePost(IMediator mediator, Post post, int id)
+        {
+            var updatePost = new UpdatePost { PostId = id, PostContent = post.Content };
+            var updatedPost = await mediator.Send(updatePost);
+            return TypedResults.Ok(updatedPost);
+        }
+
+        private async Task<IResult> DeletePost(IMediator mediator, int id)
+        {
+            var deletePost = new DeletePost { PostId = id };
+            var deletedPost = await mediator.Send(deletePost);
+            return TypedResults.NoContent();
         }
     }
 }
